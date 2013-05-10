@@ -62,8 +62,8 @@ rebuild			: clean all
 coauthor		: ${OBJS}
 	${CC} ${CFLAGS} $@.c -o $@ ${OBJS} ${LIBS}
 
-#run			:
-#	nohup ./${PROGS} > run.log 2>error.log </dev/null  &
+brun			:
+	nohup ./${PROGS} > run.log 2>error.log </dev/null  &
 	
 run			:
 	./${PROGS}

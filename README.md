@@ -12,5 +12,17 @@ PaperAuthor.csv放在data文件夹下
 make 
 
 运行:
+
 make run
+
+后台运行:
+
+make brun
+
+备注
+========================================
+csv读文件又慢又麻烦
+
+回头我打算写个sqlite的接口类
+
 
