@@ -4,6 +4,7 @@
 #include "libcsv.h"
 #include "filter.h"
 
+#define PARTDATA 1
 #define AUTH_NODE_LEN 1024
 
 typedef struct author_node
@@ -35,6 +36,7 @@ typedef struct pa_info
 pNode pNodeSearch(pNode *phead,int aid)
 {
 	pNode p;
+	pNode pl;
 	if(*phead == NULL)
 	{
 		*phead = (pNode)malloc(sizeof(aNode));
@@ -44,16 +46,39 @@ pNode pNodeSearch(pNode *phead,int aid)
 		p->next = NULL; 
 	}else
 	{
-		p = *phead;
-		while(p->next != NULL)
+		pl = p = *phead;
+		if(p->aid[0] > aid)
 		{
+			p = (pNode)malloc(sizeof(aNode));
+			p->len = 1;
+			p->aid[0] = aid;
+			p->next = *phead;
+			*phead = p;
+			return p;
+		}
+		if(p->aid[0] == aid) return p;
+		while(p != NULL)
+		{
+			pl = p;
+			p = p->next;
+			if(p == NULL) break;
 			if(p->aid[0] == aid)
 			{
 				return p;
 			}
-			p = p->next;
+			if(pl->aid[0] < aid && p->aid[0] > aid)
+			{
+				pl->next = (pNode)malloc(sizeof(aNode));
+				pl->next->next = p;
+				p = pl->next;
+				p->len = 1;
+				p->aid[0] = aid;
+				return p;
+			}
+			
 		}
-		if(p->aid[0] == aid) return p;
+		p = pl;
+		//if(p->aid[0] == aid) return p;
 		p->next = (pNode)malloc(sizeof(aNode));
 		p = p->next;
 		p->len = 1;
@@ -123,8 +148,11 @@ void nlog (int c, void *t)
 	paInfo* pi = (paInfo *)t;
 	pNode p1,p2;
 	int i;
-	//printf("id:%d id:%d\n",pi->pid,pi->pinfo.pid);
+	#ifdef PARTDATA
 	if(!pi->line || !isNecessary(pi->aid))
+	#else
+	if(!pi->line)
+	#endif
 	{
 		pi->line ++;
 		pi->col = 0;
@@ -162,10 +190,12 @@ void nlog (int c, void *t)
 
 void writedata(pNode phead,FILE *fp)
 {
-	pNode p = phead->next;
+	pNode p = phead;
 	int i;
 	while(p!=NULL)
 	{
+		
+		qsort(p->aid,p->len,sizeof(int),intcmp);
 		fprintf(fp,"%d",p->aid[0]);
 		for(i=1;i<p->len;i++)
 		{
@@ -187,9 +217,9 @@ int main (int argc,char *argv[]) {
 	FILE *fo;
 	const char *file_name="data/PaperAuthor.csv";
 	paInfo t;
-	
+	#ifdef PARTDATA
 	loadSameNameUnoverlapped();	
-
+	#endif // PARTDATA
 	if((p=(struct csv_parser *)malloc(sizeof(struct csv_parser))) == 0) return -1;
 	
 	if ((fp = fopen(file_name,"r"))== NULL)
