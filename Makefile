@@ -47,16 +47,16 @@ VPATH			:= .:include/:src/:lib/:obj/
 	export	VPATH
 LIBS			:= -L lib/ -ldl -lpthread  -lm 
 INCFLAG			:= -I include/
-CFLAGS			:= -Wall	${INCFLAG} -std=c99
+CFLAGS			:= -g -Wall	${INCFLAG} -std=c99
 GNUFLAGS		:= -Wall	${INCFLAG} -std=gnu99
-OBJS			:= libcsv.o filter.o
+OBJS			:= libcsv.o  sqlite3.o dao.o anode.o hashmap.o
 PROGS			:= coauthor
 
 .PHONY			: clean succ
 ########################################################################
 all			: ${PROGS} succ
 
-rebuild			: clean all
+rebuild			: dbclean clean all
 
 
 coauthor		: ${OBJS}
@@ -109,5 +109,5 @@ clean			:
 	${DEL} *.log
 
 dbclean			:
-	${DEL} db/features.db
+	${DEL} db/*
 
