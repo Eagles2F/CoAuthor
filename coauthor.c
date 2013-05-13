@@ -5,8 +5,9 @@
 #include "dao.h"
 #include "hashmap.h"
 #include "anode.h"
+#include "filter.h"
 
-#define PARTDATA 0
+//#define PARTDATA 0
 //#define AUTH_NODE_LEN 1024
 
 
@@ -112,15 +113,24 @@ void nlog (int c, void *t)
 	//printf("A");fflush(NULL);
 	if(pi->pid == pi->pinfo.pid) // in one paper
 	{
-		p1 =  pNodeSearch(pi->phmap,pi->aid);		
+		int f1 = isNecessary(pi->aid);
+		f1 = 1;
+		
+		if(f1) p1 =  pNodeSearch(pi->phmap,pi->aid);		
 		for(i=0;i<pi->pinfo.len;i++)
 		{
+			int f2 = isNecessary(pi->pinfo.aid[i]);
+			f2 = 1;
 			//dbaddinfo(pi->aid,pi->pinfo.aid[i]);//
 			//dbaddinfo(pi->pinfo.aid[i],pi->aid);
-			p2 =  pNodeSearch(pi->phmap,pi->pinfo.aid[i]);			
+			if(f2)  
+				p2 =  pNodeSearch(pi->phmap,pi->pinfo.aid[i]);			
 		
-			pNodeAddInfo(&p1,pi->pinfo.aid[i]);
-			pNodeAddInfo(&p2,pi->aid);
+			if(f1)
+				pNodeAddInfo(&p1,pi->pinfo.aid[i]);
+				
+			if(f2)  
+				pNodeAddInfo(&p2,pi->aid);
 		
 		}
 		
@@ -168,10 +178,6 @@ void storeintodb(hashmap *phmap)
 			{
 				dbaddinfo(np->aid[0],np->aid[i]);
 			}
-			if(np->len == 1) 
-			{
-				fprintf(fp,"%ld\n",np->aid[0]);
-			}
 		}
 		ap = ap->next;
 	}
@@ -190,7 +196,7 @@ int main (int argc,char *argv[]) {
 	size_t bytes_read;
 	const char *file_name="data/PaperAuthor.csv";
 	paInfo t;
-
+	loadSameNameUnoverlapped();
 	
 
 	if((p=(struct csv_parser *)malloc(sizeof(struct csv_parser))) == 0) return -1;
@@ -249,7 +255,7 @@ int main (int argc,char *argv[]) {
 	int alen;
 	//test 2230280
 	dbconnect();
-	alen = getcoau(2230280,a,300);
+	alen = getcoau(972575,a,300);
 	printf("len is:%d",alen);
 	for(int i=0;i<alen;i++)
 		printf("%d ",a[i]);

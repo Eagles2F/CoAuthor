@@ -49,7 +49,7 @@ LIBS			:= -L lib/ -ldl -lpthread  -lm
 INCFLAG			:= -I include/
 CFLAGS			:= -g -Wall	${INCFLAG} -std=c99
 GNUFLAGS		:= -Wall	${INCFLAG} -std=gnu99
-OBJS			:= libcsv.o  sqlite3.o dao.o anode.o hashmap.o
+OBJS			:= libcsv.o  sqlite3.o dao.o anode.o hashmap.o filter.o
 PROGS			:= coauthor
 
 .PHONY			: clean succ

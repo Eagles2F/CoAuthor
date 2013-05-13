@@ -18,11 +18,14 @@ typedef struct coaulimit
 int dbcreatetable()
 {
 	const char *createTableQuery ="create table CoAuthor(\
+			id integer  primary key,\
 			aid integer ,\
-			coaid integer ,\
-			constraint pk_t1 primary key(aid,coaid))";
-
-	sqlite3_exec(msrc,createTableQuery,0,0,0);
+			coaid integer )";
+			//constraint pk_t1 primary key(aid,coaid))";
+	char *emsg;
+	//printf("%s\n",createTableQuery);
+	sqlite3_exec(msrc,createTableQuery,0,0,&emsg);
+	if(emsg != NULL) fprintf(stderr,"%s",emsg);
 	return 0;
 }
 
@@ -76,6 +79,8 @@ int getcoau(int aid,int pool[],int len)
 	// limit 4 offset 2 -- from 3,4,5,6
 	// order by xxx asc|desc
 	
+	//printf("%s\n",query);fflush(NULL);
+	
 	ca.max = len;
 	ca.now = 0;
 	ca.pool = pool;
@@ -86,7 +91,8 @@ int getcoau(int aid,int pool[],int len)
 
 	if(errmsg != NULL)
 	{
-		fprintf(stderr,"ERROR:QUERY ERROR %s::%d!\n",__FILE__,__LINE__); 
+		fprintf(stderr,"E:%d:%s\n%s::%d!\n",
+				sqlite3_errcode(msrc),errmsg,__FILE__,__LINE__); 
 		return 0;
 	}
 	
